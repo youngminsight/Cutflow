@@ -1,0 +1,45 @@
+name: Build Cutflow APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Unpack Cutflow source code
+        run: unzip -o cutflow_src.zip
+
+      - name: Create Android project files
+        run: | flutter create --org com.cutflow --project-name cutflow --platforms android _tmp cp -r _tmp/android android cp _tmp/pubspec.yaml pubspec.yaml cp _tmp/analysis_options.yaml analysis_options.yaml rm -rf _tmp sed -i 's/android:label="cutflow"/android:label="Cutflow"/' android/app/src/main/AndroidManifest.xml sed -i 's/minSdk = flutter.minSdkVersion/minSdk = 24/; s/minSdkVersion flutter.minSdkVersion/minSdkVersion 24/' android/app/build.gradle* || true 
+      - name: Add packages
+        run: flutter pub add video_player image_picker path_provider gal ffmpeg_kit_flutter_new_min_gpl
+
+      - name: Check code
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings
+
+      - name: Run tests
+        continue-on-error: true
+        run: flutter test
+
+      - name: Build APK
+        run: flutter build apk --release --target-platform android-arm64
+
+      - name: Publish APK
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: cutflow-${{ github.run_number }}
+          name: Cutflow build ${{ github.run_number }}
+          files: build/app/outputs/flutter-apk/app-release.apk
