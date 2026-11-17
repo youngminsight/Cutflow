@@ -31,10 +31,10 @@ jobs:
         run: sed -i "s/android:label=.cutflow./android:label=\x22Cutflow\x22/" android/app/src/main/AndroidManifest.xml
       - name: Set minimum Android version
         run: sed -i "s/flutter.minSdkVersion/24/" android/app/build.gradle*
-      - name: Allow microphone
-        run: sed -i "s|<application|<uses-permission android:name=\x22android.permission.RECORD_AUDIO\x22/><application|" android/app/src/main/AndroidManifest.xml
+      - name: Add permissions
+        run: sed -i "s|<application|<uses-permission android:name=\x22android.permission.INTERNET\x22/><uses-permission android:name=\x22android.permission.RECORD_AUDIO\x22/><application|" android/app/src/main/AndroidManifest.xml
       - name: Add packages
-        run: flutter pub add video_player image_picker path_provider gal ffmpeg_kit_flutter_new_min_gpl file_picker:^12.0.0 record
+        run: flutter pub add video_player image_picker path_provider gal ffmpeg_kit_flutter_new_min file_picker:^12.0.0 record whisper_wrapper
       - name: Check code
         run: flutter analyze --no-fatal-infos --no-fatal-warnings
       - name: Run tests
