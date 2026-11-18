@@ -37,6 +37,10 @@ jobs:
         run: sed -i "s|<application|<uses-permission android:name=\x22android.permission.INTERNET\x22/><uses-permission android:name=\x22android.permission.RECORD_AUDIO\x22/><application|" android/app/src/main/AndroidManifest.xml
       - name: Add packages
         run: flutter pub add video_player image_picker path_provider gal ffmpeg_kit_flutter_new_min file_picker:^12.0.0 record whisper_wrapper
+      - name: Add icon tool
+        run: flutter pub add --dev flutter_launcher_icons
+      - name: Make app icon
+        run: dart run flutter_launcher_icons
       - name: Check code
         run: flutter analyze --no-fatal-infos --no-fatal-warnings
       - name: Run tests
